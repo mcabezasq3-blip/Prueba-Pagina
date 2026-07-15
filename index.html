@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Trabajo y Potencia Mecánica de Ejercicios de Calistenia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f4f9; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; text-align: center; }
+        input, select { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; transition: border-color 0.3s; }
+        .input-error { border: 2px solid #dc3545 !important; background-color: #f8d7da; }
+        .msg-error { color: #dc3545; font-size: 14px; font-weight: bold; display: none; margin-top: -5px; margin-bottom: 10px; }
+        button { background-color: #28a745; color: white; border: none; padding: 12px 20px; cursor: pointer; border-radius: 4px; font-size: 16px; margin-top: 10px; width: 95%; }
+        button:hover { background-color: #218838; }
+        .btn-limpiar { background-color: #dc3545; margin-top: 20px;}
+        .btn-limpiar:hover { background-color: #c82333; }
+        #resultado { margin-top: 20px; font-weight: bold; font-size: 20px; color: #007bff; }
+        #equivalencia { margin-top: 10px; font-weight: bold; font-size: 16px; color: #555; }
+        #mensajePromedio { margin-top: 10px; font-weight: bold; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        .total-box { margin-top: 15px; font-size: 18px; font-weight: bold; color: #333; }
+        canvas { margin-top: 30px; width: 100% !important; max-width: 500px; height: auto !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculadora de Trabajo</h2>
+    <h3>Ejercicios de Calistenia</h3>
+    <select id="genero">
+        <option value="" disabled selected>Seleccione género</option>
+        <option value="m">Masculino</option>
+        <option value="f">Femenino</option>
+        <option value="o">Otro</option>
+    </select>
+    <input type="number" id="edad" placeholder="Edad (años)" min="1">
+    <input type="number" id="masa" placeholder="Masa corporal (kg)" min="1">
+    
+    <hr>
+    
+    <!-- Aquí agregamos el data-tiempo estimado por repetición en segundos -->
+    <select id="ejercicio">
+        <option value="" disabled selected>Seleccione el ejercicio</option>
+        <option value="0.68" data-tiempo="2.5">Flexiones de pecho (~68% masa)</option>
+        <option value="0.88" data-tiempo="3.0">Sentadillas (~88% masa)</option>
+        <option value="0.95" data-tiempo="3.5">Dominadas (~95% masa)</option>
+        <option value="1.00" data-tiempo="2.0">Saltos / Burpees (100% masa)</option>
+    </select>
+    <input type="number" id="distancia" placeholder="Distancia por repetición (cm)" min="1">
+    <input type="number" id="repeticiones" placeholder="Número de repeticiones" min="1">
+    
+    <p id="mensaje-error" class="msg-error">Por favor, completa correctamente los campos marcados en rojo.</p>
+
+    <button id="btn-calcular">Agregar Serie y Calcular</button>
+
+    <p id="resultado"></p>
+    <p id="equivalencia"></p>
+    <p id="mensajePromedio"></p>
+
+    <canvas id="graficoJoules"></canvas>
+
+    <h3>Historial de Rutina</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Ejercicio</th>
+                <th>Trabajo (J)</th>
+                <th>Potencia (W)</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-historial">
+        </tbody>
+    </table>
+    <div class="total-box">Total Energía Hoy: <span id="txt-total-joules">0.00</span> J</div>
+
+    <button id="btn-limpiar" class="btn-limpiar">Limpiar Rutina</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

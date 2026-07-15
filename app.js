@@ -13,93 +13,32 @@ const pResultado = document.getElementById('resultado');
 const pEquivalencia = document.getElementById('equivalencia');
 const pMensajePromedio = document.getElementById('mensajePromedio');
 const canvasGrafico = document.getElementById('graficoJoules');
+const canvasPotencia = document.getElementById('graficoPotencia'); // NUEVO: Canvas de potencia
 
 const tbodyHistorial = document.getElementById('tbody-historial');
 const txtTotalJoules = document.getElementById('txt-total-joules');
 
-// Referencia a la imagen en el HTML
-const imagenEjercicio = document.getElementById('ejercicio-imagen');
-
-// Estructura para tus imágenes locales. Reemplaza las rutas con las de tu repositorio.
-const rutasImagenes = {
-    "default": "./assets/img/calistenia_default.jpg",
-    "0.68": "./assets/img/flexiones.gif",    // Valor del option de flexiones
-    "0.88": "./assets/img/sentadillas.gif",  // Valor del option de sentadillas
-    "0.95": "./assets/img/dominadas.gif",    // Valor del option de dominadas
-    "1.00": "./assets/img/burpees.gif"       // Valor del option de burpees
-};
-
 // ==================== VARIABLES Y VECTORES ====================
 let chartInstance = null;
+let chartPotenciaInstance = null; // NUEVO: Instancia para el gráfico de potencia
 
 let vectorEjercicios = [];
 let vectorJoules = [];
 let vectorWatts = [];
 
-// 40 equivalencias calculadas con aproximaciones físicas de Fuerza x Distancia
 const equivalencias = [
     { costo: 333, texto: "subir [N] pisos por las escaleras" },
     { costo: 196, texto: "levantar [N] cajas de 10 kg del suelo" },
     { costo: 147, texto: "levantar a un niño de 15 kg [N] veces" },
     { costo: 196, texto: "subir [N] botellones de agua de 20 litros" },
-    { costo: 294, texto: "cargar [N] tanques de gas llenos (30 kg)" },
-    { costo: 441, texto: "levantar [N] quintales de arroz (45 kg) a 1 metro" },
-    { costo: 490, texto: "cargar [N] sacos de cemento (50 kg)" },
-    { costo: 98,  texto: "levantar [N] mochilas universitarias pesadas (10 kg)" },
-    { costo: 58,  texto: "alzar [N] gatos gordos (6 kg) desde el piso" },
-    { costo: 245, texto: "levantar [N] fundas grandes de comida de perro (25 kg)" },
-    { costo: 117, texto: "elevar [N] llantas de automóvil pequeñas (12 kg)" },
-    { costo: 147, texto: "cargar [N] baldes de pintura de un galón (15 kg)" },
-    { costo: 39,  texto: "levantar [N] sillas de madera comunes (4 kg)" },
-    { costo: 78,  texto: "alzar [N] televisores medianos antiguos (8 kg)" },
-    { costo: 49,  texto: "levantar [N] resmas de papel de 500 hojas (5 kg)" },
-    { costo: 686, texto: "empujar [N] refrigeradoras pequeñas 1 metro" },
-    { costo: 882, texto: "mover [N] motocicletas de 90 kg un metro de distancia" },
-    { costo: 19,  texto: "levantar [N] botellas de cola de 2 litros" },
-    { costo: 14,  texto: "alzar [N] laptops estándar (1.5 kg)" },
-    { costo: 24,  texto: "levantar [N] sandías grandes (2.5 kg)" },
-    { costo: 88,  texto: "cargar [N] canastos de ropa mojada (9 kg)" },
-    { costo: 137, texto: "levantar [N] bicicletas montañeras (14 kg)" },
-    { costo: 343, texto: "cargar [N] sacos de papas de 35 kg" },
-    { costo: 176, texto: "alzar [N] microondas estándar (18 kg)" },
-    { costo: 29,  texto: "levantar [N] bloques de ladrillo (3 kg)" },
-    { costo: 215, texto: "cargar [N] maletas de viaje llenas (22 kg)" },
-    { costo: 490, texto: "levantar [N] yunques de herrería pequeños (50 kg)" },
-    { costo: 156, texto: "alzar [N] cajas de herramientas llenas (16 kg)" },
-    { costo: 588, texto: "levantar [N] personas de 60 kg un metro del suelo" },
-    { costo: 735, texto: "cargar [N] personas de 75 kg un metro del suelo" },
-    { costo: 107, texto: "levantar [N] cajas de cervezas o colas (11 kg)" },
-    { costo: 392, texto: "alzar [N] sacos de arena para entrenamiento (40 kg)" },
-    { costo: 784, texto: "levantar [N] lavadoras modernas (80 kg) un metro" },
-    { costo: 274, texto: "cargar [N] colchones de dos plazas (28 kg)" },
-    { costo: 980, texto: "mover [N] roperos llenos de ropa (100 kg)" },
-    { costo: 127, texto: "levantar [N] carretillas vacías (13 kg)" },
-    { costo: 441, texto: "cargar [N] carretillas llenas de tierra (45 kg)" },
-    { costo: 68,  texto: "alzar [N] guitarras con su estuche duro (7 kg)" },
-    { costo: 313, texto: "levantar [N] motores pequeños fuera de borda (32 kg)" },
-    { costo: 8,   texto: "alzar [N] tazas de café llenas 1 metro hacia tu boca" }
+    { costo: 294, texto: "cargar [N] tanques de gas llenos (30 kg)" }
 ];
 
 window.onload = function() {
     cargarDatosLocales();
-    // Iniciar con la imagen por defecto si existe
-    if(imagenEjercicio) imagenEjercicio.src = rutasImagenes["default"];
 };
 
 // ==================== EVENTOS ====================
-
-// Evento para cambiar la imagen al seleccionar el ejercicio
-selectEjercicio.addEventListener('change', function() {
-    const valorSeleccionado = selectEjercicio.value; 
-    
-    // Si el valor seleccionado coincide con alguna ruta en nuestro objeto, la cambiamos
-    if (rutasImagenes[valorSeleccionado]) {
-        imagenEjercicio.src = rutasImagenes[valorSeleccionado];
-    } else {
-        imagenEjercicio.src = rutasImagenes["default"];
-    }
-});
-
 btnCalcular.addEventListener('click', function () {
     if (validarCamposVisulamente()) {
         fnCalcularYAgregarSerie();
@@ -117,10 +56,7 @@ btnLimpiar.addEventListener('click', function () {
     pEquivalencia.innerText = "";
     pMensajePromedio.innerText = "";
     if (chartInstance) chartInstance.destroy();
-    
-    // Regresar a la imagen por defecto al limpiar
-    selectEjercicio.selectedIndex = 0;
-    if(imagenEjercicio) imagenEjercicio.src = rutasImagenes["default"];
+    if (chartPotenciaInstance) chartPotenciaInstance.destroy(); // NUEVO: Limpiar gráfico de potencia
 });
 
 // ==================== FUNCIONES LÓGICAS ====================
@@ -217,6 +153,7 @@ function presentarVectores() {
         }
 
         actualizarGrafico(totalJoulesAcumulados, metaAcumulada);
+        actualizarGraficoPotencia(); // NUEVO: Actualizar la gráfica de potencia con la nueva serie
     }
 }
 
@@ -250,6 +187,44 @@ function actualizarGrafico(joulesUsuario, promedioHumano) {
             }]
         },
         options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+}
+
+// NUEVA FUNCIÓN: Genera la gráfica de picos para la Potencia
+function actualizarGraficoPotencia() {
+    const ctx = canvasPotencia.getContext("2d");
+    if (chartPotenciaInstance) chartPotenciaInstance.destroy();
+
+    // Generar labels automáticos según la cantidad de series que haya (Serie 1, Serie 2, etc.)
+    const labelsSeries = vectorWatts.map((_, index) => `Serie ${index + 1}`);
+
+    chartPotenciaInstance = new Chart(ctx, {
+        type: 'line', // Tipo línea para los picos
+        data: {
+            labels: labelsSeries,
+            datasets: [{
+                label: 'Potencia (Watts)',
+                data: vectorWatts,
+                borderColor: '#ffc107', // Color de la línea (amarillo)
+                backgroundColor: 'rgba(255, 193, 7, 0.2)', // Fondo semitransparente debajo de la línea
+                borderWidth: 2,
+                pointBackgroundColor: '#dc3545', // Color de los puntos/picos (rojo)
+                pointRadius: 5, // Tamaño de los picos
+                tension: 0, // Esto es clave: 0 hace que las líneas sean rectas de un punto a otro formando "picos"
+                fill: true
+            }]
+        },
+        options: { 
+            responsive: true, 
+            plugins: { 
+                legend: { display: true } 
+            },
+            scales: {
+                y: {
+                    beginAtZero: true // Obliga a que el gráfico arranque desde cero en el eje Y
+                }
+            }
+        }
     });
 }
 

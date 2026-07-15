@@ -23,17 +23,6 @@
         th { background-color: #007bff; color: white; }
         .total-box { margin-top: 15px; font-size: 18px; font-weight: bold; color: #333; }
         canvas { margin-top: 30px; width: 100% !important; max-width: 500px; height: auto !important; }
-
-        /* Estilos para la imagen dinámica */
-        .imagen-ejercicio {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
     </style>
 </head>
 <body>
@@ -41,10 +30,6 @@
 <div class="container">
     <h2>Calculadora de Trabajo</h2>
     <h3>Ejercicios de Calistenia</h3>
-    
-    <!-- IMAGEN DINÁMICA DE EJERCICIO -->
-    <img id="ejercicio-imagen" src="calistenia.jpg" alt="Imagen del ejercicio" class="imagen-ejercicio">
-
     <select id="genero">
         <option value="" disabled selected>Seleccione género</option>
         <option value="m">Masculino</option>
@@ -76,6 +61,9 @@
     <p id="mensajePromedio"></p>
 
     <canvas id="graficoJoules"></canvas>
+
+    <h3 style="margin-top: 30px;">Evolución de Potencia (Watts)</h3>
+    <canvas id="graficoPotencia"></canvas>
 
     <h3>Historial de Rutina</h3>
     <table>
